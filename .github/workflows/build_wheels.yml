@@ -26,9 +26,9 @@ jobs:
       - name: Upgrade pip + install build deps
         run: python -m pip install -U pip setuptools wheel "cmdstanpy==1.2.*"
 
-      # Optional: cache a home-dir CmdStan to speed things up in future manual runs.
-      # NOTE: Your setup.py installs CmdStan inside the build dir, not ~/.cmdstan,
-      # so this cache WON'T be used unless you later change setup.py to use ~/.cmdstan.
+      # Optional: cache a home-dir CmdStan to speed up repeated manual runs.
+      # NOTE: setup.py installs/prunes CmdStan inside the build dir when GLORIA_REPACKAGE_CMDSTAN=TRUE,
+      # so this cache is only useful if you later change setup.py to reuse ~/.cmdstan.
       - name: Cache ~/.cmdstan (optional)
         uses: actions/cache@v4
         with:
@@ -40,33 +40,44 @@ jobs:
           GLORIA_REPACKAGE_CMDSTAN: "TRUE"
         run: |
           python setup.py bdist_wheel
-          python -c "import pathlib; p=list(pathlib.Path('dist').glob('*.whl')); print('Built wheel:', p[0] if p else 'none')"
+          python - <<'PY'
+          import pathlib
+          dist = pathlib.Path("dist")
+          wheels = list(dist.glob("*.whl"))
+          print("Built wheel(s):", [str(p) for p in wheels] or "none")
+          PY
 
-      - name: Collect build tree for inspection
+      - name: List build/lib contents
         shell: bash
         run: |
-          mkdir -p artifact_tree
-          # wheel(s)
-          cp -v dist/*.whl artifact_tree/ || true
-          # copy the built package area where setup.py staged executables
-          # (build/lib/... mirrors the installed package layout)
+          echo "== Wheels in dist =="
+          ls -l dist || true
+          echo "== build/lib listing (if present) =="
           if [ -d "build/lib" ]; then
-            echo "Listing build/lib contents:"
             find build/lib -maxdepth 4 -type f | sort
-            # zip relevant dirs for inspection
-            python - <<'PY'
-import shutil, pathlib
-root = pathlib.Path("build/lib")
-out = pathlib.Path("artifact_tree/build_lib.zip")
-shutil.make_archive(str(out.with_suffix('')), 'zip', str(root))
-print("Zipped", out)
-PY
+          else
+            echo "No build/lib directory found."
           fi
+
+      - name: Zip build/lib (separate Python step)
+        run: |
+          python - <<'PY'
+          import pathlib, shutil
+          root = pathlib.Path("build/lib")
+          outdir = pathlib.Path("artifact_tree")
+          outdir.mkdir(exist_ok=True)
+          out = outdir / "build_lib.zip"
+          if root.exists():
+              shutil.make_archive(str(out.with_suffix('')), 'zip', str(root))
+              print("Zipped", out)
+          else:
+              print("No build/lib directory; skipping zip")
+          PY
 
       - name: Upload artifacts (wheel + build tree zip)
         uses: actions/upload-artifact@v4
         with:
           name: stan-build-${{ matrix.os }}
           path: |
-            artifact_tree/*.whl
+            dist/*.whl
             artifact_tree/*.zip
