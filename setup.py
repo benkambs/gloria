@@ -26,7 +26,7 @@ MODELS = [
     "negative_binomial",
     "gamma",
     "beta",
-    "beta-binomial",
+    "beta_binomial",
 ]
 
 
