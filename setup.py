@@ -183,6 +183,8 @@ class WheelABINone(bdist_wheel):
 
 
 setup(
+    packages=["gloria"],
+    package_dir={"gloria": "gloria"},
     # Extension marks this as platform-specific
     ext_modules=[Extension("gloria.stan", [])],
     # override the build and bdist commands
