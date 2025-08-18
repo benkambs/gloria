@@ -5,3 +5,4 @@ gloria/stan_models/cmdstan-*/
 demonstrations/
 dist/
 stashed_stuff/
+wheelhouse/
