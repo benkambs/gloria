@@ -4,3 +4,4 @@ gloria/stan_models/cmdstan-*/
 **/models
 demonstrations/
 dist/
+wheelhouse/
