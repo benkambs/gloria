@@ -1,83 +1,56 @@
-name: Manual build Stan models
+name: "Build wheels"
 
 on:
+  release:
+    types: [ published ]
   workflow_dispatch: {}
 
-env:
-  CMDSTAN_VERSION: "2.36.0"   # keep in sync with setup.py
 
 jobs:
-  build:
+  make-wheels:
+    name: Make ${{ matrix.os }} wheels
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: ["macos-latest", "ubuntu-latest", "windows-latest"]
       fail-fast: false
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: "Checkout repo"
+        uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: "Build wheels"
+        uses: pypa/cibuildwheel@v2.8.1
         with:
-          python-version: "3.11"
+          package-dir: .
 
-      - name: Upgrade pip + install build deps
-        run: python -m pip install -U pip setuptools wheel "cmdstanpy==1.2.*"
-
-      # Optional: cache a home-dir CmdStan to speed up repeated manual runs.
-      # NOTE: setup.py installs/prunes CmdStan inside the build dir when GLORIA_REPACKAGE_CMDSTAN=TRUE,
-      # so this cache is only useful if you later change setup.py to reuse ~/.cmdstan.
-      - name: Cache ~/.cmdstan (optional)
-        uses: actions/cache@v4
-        with:
-          path: ~/.cmdstan
-          key: ${{ runner.os }}-cmdstan-${{ env.CMDSTAN_VERSION }}
-
-      - name: Build wheel via setup.py (repackage cmdstan)
         env:
-          GLORIA_REPACKAGE_CMDSTAN: "TRUE"
-        run: |
-          python setup.py bdist_wheel
-          python - <<'PY'
-          import pathlib
-          dist = pathlib.Path("dist")
-          wheels = list(dist.glob("*.whl"))
-          print("Built wheel(s):", [str(p) for p in wheels] or "none")
-          PY
+          CIBW_ENVIRONMENT: >
+            GLORIA_REPACKAGE_CMDSTAN=TRUE
 
-      - name: List build/lib contents
-        shell: bash
-        run: |
-          echo "== Wheels in dist =="
-          ls -l dist || true
-          echo "== build/lib listing (if present) =="
-          if [ -d "build/lib" ]; then
-            find build/lib -maxdepth 4 -type f | sort
-          else
-            echo "No build/lib directory found."
-          fi
+          CIBW_MANYLINUX_X86_64_IMAGE: manylinux2014
+          CIBW_BUILD: cp312-*
+          CIBW_SKIP: "*musllinux*"
+          CIBW_ARCHS: native
+          CIBW_BUILD_FRONTEND: build
 
-      - name: Zip build/lib (separate Python step)
-        run: |
-          python - <<'PY'
-          import pathlib, shutil
-          root = pathlib.Path("build/lib")
-          outdir = pathlib.Path("artifact_tree")
-          outdir.mkdir(exist_ok=True)
-          out = outdir / "build_lib.zip"
-          if root.exists():
-              shutil.make_archive(str(out.with_suffix('')), 'zip', str(root))
-              print("Zipped", out)
-          else:
-              print("No build/lib directory; skipping zip")
-          PY
-
-      - name: Upload artifacts (wheel + build tree zip)
-        uses: actions/upload-artifact@v4
+      - name: "Upload wheel as artifact"
+        uses: actions/upload-artifact@v3
         with:
-          name: stan-build-${{ matrix.os }}
-          path: |
-            dist/*.whl
-            artifact_tree/*.zip
+          name: artifact-${{ matrix.os }}-wheel
+          path: "./**/*.whl"
+
+  make-sdist:
+    name: Make source distribution
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: pipx run build --sdist
+
+    - uses: actions/upload-artifact@v3
+      with:
+        name: artifact-source-dist
+        path: "./**/dist/*.tar.gz"
+
+

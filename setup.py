@@ -20,13 +20,13 @@ from wheel.bdist_wheel import bdist_wheel
 MODEL_DIR = "gloria/stan_models"
 
 MODELS = [
+    "normal",
     "poisson",
     "binomial",
-    "normal",
+    "negative_binomial",
     "gamma",
     "beta",
-    "beta_binomial",
-    "negative_binomial",
+    "beta-binomial",
 ]
 
 
@@ -74,8 +74,9 @@ def repackage_cmdstan() -> bool:
 
 
 def maybe_install_cmdstan_toolchain() -> None:
-    """Install C++ compilers required to build stan models on Windows
-    machines."""
+    """
+    Install C++ compilers required to build stan models on Windows machines.
+    """
 
     try:
         cmdstanpy.utils.cxx_toolchain_path()
@@ -114,8 +115,8 @@ def install_cmdstan_deps(cmdstan_dir: Path) -> None:
             cmdstanpy.cmdstan_path()
         except ValueError as e:
             raise SystemExit(
-                "CmdStan not installed, but the package is building from "
-                "source"
+                "CmdStan not installed, but the package is building from"
+                " source"
             ) from e
 
 
@@ -167,10 +168,10 @@ class CleanModels(clean):
 
 # this is taken from the cibuildwheel example
 # https://github.com/joerick/python-ctypes-package-sample
-# it marks the wheel as not specific to the Python API version.
-# This means the wheel will only be built once per platform, rather than
-# per-Python-per-platform. If you are combining with any actual C extensions,
-# you will most likely want to remove this.
+# it marks the wheel as not specific to the Python API version. This means the
+# wheel will only be built once per platform, rather than per-Python-per-
+# platform. If you are combining with any actual C extensions, you will most
+# likely want to remove this.
 class WheelABINone(bdist_wheel):
     def finalize_options(self) -> None:
         bdist_wheel.finalize_options(self)
