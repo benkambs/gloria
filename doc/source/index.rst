@@ -15,7 +15,7 @@ It enhances Prophet’s GLM-based structure with advanced probabilistic modeling
 
 .. _cards-clickable:
 
-Get started
+Get Started
 ............
 
 .. grid:: 1 1 2 2
@@ -23,7 +23,7 @@ Get started
    :margin: 0 0 2 0
 
    .. grid-item-card:: 🚀 Get Started
-      :link: get_started/index
+      :link: user_guide/index
       :link-type: doc
 
       **Learn by doing.**  
@@ -55,7 +55,7 @@ Built for Professionals
       :text-align: center
       :columns: 4
 
-      Gloria handles arbitrary sampling intervals (not just daily)
+      Gloria handles arbitrary sampling intervals beyond daily
 
    .. grid-item-card:: Rich Event Modeling
       :text-align: center
@@ -84,10 +84,10 @@ Built for Professionals
       :columns: 4
 
       Type hints, pydantic for validation, and a clean API design reminiscent 
-      of `Prophet <https://facebook.github.io/prophet/>`_. but with a much more
+      of `Prophet <https://facebook.github.io/prophet/>`_, but with a much more
       maintainable and extensible codebase.    
 
-Get involved
+Get Involved
 .............
 
 Gloria is Open Source and thrives through your ideas, usage, and feedback.  
@@ -98,12 +98,12 @@ Try it, contribute, or just explore:
 - 📄 `License MIT <https://github.com/e-dyn/gloria/blob/main/LICENSE>`__
 
 
-Table of contents
+Table of Contents
 ..................
 
 .. toctree::
    :maxdepth: 2
 
-   get_started/index
+   user_guide/index
    api/index
    release_notes/index
