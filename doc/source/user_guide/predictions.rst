@@ -1,7 +1,6 @@
 .. _ref-predictions:
 .. currentmodule:: gloria
 
-
 Predictions
 ===========
 
@@ -77,6 +76,8 @@ The plot elements forecast, trend, and confidence intervals are all stored in th
 
 Some of these columns need further explanation, which is given in the following.
 
+.. _ref-data-variability:
+
 Confidence Bands vs Data Variability
 ------------------------------------
 
@@ -101,9 +102,14 @@ In contrast, data variability is always computed, as it only requires the point 
   :width: 700
   :alt: Comparison of confidence band with data variability
 
+.. tip::
+    Use the *data variability* intervals (``observed_upper`` / ``observed_lower``) when comparing the model to the observed data. For example, to visually check whether the model error is consistent with the noise in the data.
+
+    Use the *model uncertainty* intervals (``yhat_upper`` / ``yhat_lower``) when evaluating the model`s **forecast uncertainty**. For example, when asking how sure the model is about future values or counterfactual scenarios.
+
 .. important::
     
-    Keep in mind: in Prophet ``yhat_upper`` and ``yhat_lower`` represent data variability and therefore correspond to Gloria's ``observed_upper`` and ``observed_lower``.
+    Keep in mind: in Prophet ``yhat_upper`` and ``yhat_lower`` represent data variability and therefore correspond to Gloria's ``observed_upper`` and ``observed_lower`` (See also :ref:`Migrate from Prophet <ref-prophet-migration-data-variability>`).
 
 Trend Predictions
 -----------------
