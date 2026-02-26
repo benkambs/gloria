@@ -7,6 +7,7 @@
 [![Linting: Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
 [![Checked with mypy](https://www.mypy-lang.org/static/mypy_badge.svg)](https://mypy-lang.org/)
 [![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://docs.pydantic.dev/latest/contributing/#badges)
+![PyPI](https://img.shields.io/pypi/v/gloria.svg)
 
 Gloria is a modern open-source framework for time series analysis and forecasting, designed for the demands of complex, real-world data. It combines robust statistical modeling with flexible controls and full transparency to enable trustworthy forecasting.
 
